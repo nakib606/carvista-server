@@ -25,8 +25,44 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const brands = client.db("carvistaDB").collection("brands");
+
+    const brandsData = [
+      {
+        brandName: "Toyota",
+        img: "https://i.ibb.co/3Nbjh4j/car-1.png",
+      },
+      {
+        brandName: "Ford",
+        img: "https://i.ibb.co/vVmcCQz/carf-2.png",
+      },
+      {
+        brandName: "BMW",
+        img: "https://i.ibb.co/vxbQzVx/car-3.jpg",
+      },
+      {
+        brandName: "Mercedes-Benz",
+        img: "https://i.ibb.co/VtsK7CG/car-4.jpg",
+      },
+      {
+        brandName: "Tesla",
+        img: "https://i.ibb.co/fGkxjzT/car-5.jpg",
+      },
+      {
+        brandName: "Honda",
+        img: "https://i.ibb.co/vQJ4GvX/car-6.jpg",
+      },
+    ];
+
+    // Prevent additional documents from being inserted if one fails
+    const options = { ordered: true };
+    // Execute insert operation
+    const result = await brands.insertMany(brandsData, options);
+    // Print result
+    console.log(`${result.insertedCount} documents were inserted`);
+
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    https: await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
