@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -27,11 +27,81 @@ async function run() {
 
     const productCollection = client.db("carVista").collection("products");
 
+    const addedProductsCollection = client
+      .db("carVista")
+      .collection("addedproducts");
+
     // getting product from database
     app.get("/addproduct", async (req, res) => {
       const cursor = productCollection.find();
       const products = await cursor.toArray();
       res.send(products);
+    });
+    app.get("/allproducts", async (req, res) => {
+      const cursor = productCollection.find();
+      const products = await cursor.toArray();
+      res.send(products);
+    });
+    app.get("/details", async (req, res) => {
+      const cursor = addedProductsCollection.find();
+      const products = await cursor.toArray();
+      res.send(products);
+    });
+
+    // getting single data from database
+    app.get("/addproduct/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const product = await productCollection.findOne(query);
+      res.send(product);
+    });
+    // getting single data from database
+    app.get("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const product = await productCollection.findOne(query);
+      res.send(product);
+    });
+
+    app.put("/updated/:id", async (req, res) => {
+      const id = req.params.id;
+      const product = req.body;
+      const options = { upsert: true };
+      const filter = { _id: new ObjectId(id) };
+      const updatedProduct = {
+        $set: {
+          img: product.img,
+          name: product.name,
+          brand: product.brand,
+          type: product.type,
+          price: product.price,
+          description: product.description,
+          rating: product.rating,
+        },
+      };
+      const result = await productCollection.updateOne(
+        filter,
+        updatedProduct,
+        options
+      );
+      res.send(result);
+    });
+
+    // getting single data from database
+    app.get("/details/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const product = await productCollection.findOne(query);
+      res.send(product);
+    });
+
+    // delete from database
+    app.delete("/addproduct/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log("please delete from database", id);
+      const query = { _id: new ObjectId(id) };
+      const result = await productCollection.deleteOne(query);
+      res.send(result);
     });
 
     // sending added products to database
@@ -39,6 +109,14 @@ async function run() {
       const product = req.body;
       console.log(product);
       const result = await productCollection.insertOne(product);
+      res.send(result);
+    });
+
+    // sending added products to database
+    app.post("/details", async (req, res) => {
+      const product = req.body;
+      console.log(product);
+      const result = await addedProductsCollection.insertOne(product);
       res.send(result);
     });
 
