@@ -32,16 +32,24 @@ async function run() {
       .collection("addedproducts");
 
     // getting product from database
-    app.get("/addproduct", async (req, res) => {
+    /*   app.get("/addproduct", async (req, res) => {
       const cursor = productCollection.find();
       const products = await cursor.toArray();
       res.send(products);
-    });
+    }); */
     app.get("/allproducts", async (req, res) => {
       const cursor = productCollection.find();
       const products = await cursor.toArray();
       res.send(products);
     });
+
+    app.get("/allproducts/:brandname", async (req, res) => {
+      const name = req.params.brandname;
+      const query = { brand: name }; // Assuming the field name is 'name' in your collection
+      const products = await productCollection.find(query).toArray();
+      res.send(products);
+    });
+
     app.get("/details", async (req, res) => {
       const cursor = addedProductsCollection.find();
       const products = await cursor.toArray();
@@ -100,7 +108,7 @@ async function run() {
       const id = req.params.id;
       console.log("please delete from database", id);
       const query = { _id: new ObjectId(id) };
-      const result = await productCollection.deleteOne(query);
+      const result = await addedProductsCollection.deleteOne(query);
       res.send(result);
     });
 
